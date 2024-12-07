@@ -64,3 +64,52 @@ WHERE location like '%Los Angeles%'
 GROUP BY Product 
 ;
 
+
+
+
+
+----------- Advanced Customer & Order analytics
+--Which location in NY received at least 3 orders in Jan and how many orders did each have
+SELECT distinct location, count(orderID)
+FROM JanSales
+WHERE location like '%NY%'
+AND length(orderid) = 6
+AND orderid <> 'OrderID'
+HAVING count(orderId) > 2
+;
+
+--How many of each type of headphones were sold in Jan
+SELECT Product, sum(Quantity)
+FROM JanSales
+WHERE Product like '%headphones%'
+GROUP BY Product
+;
+
+--- what was the average amount spend per account in Februray 
+SELECT avg(quantity*price)
+FROM FebSales
+left join customers
+on FebSales.orderID = customers.order_id
+WHERE length(orderid) = 6
+and orderid<> 'Order ID'
+;
+
+---what was the average quantity of products purchased per account in feb
+SELECT sum(quantity)/count(customers.acctnum) 
+FROM FebSales
+left join customers
+on FebSales.orderID = customers.order_id
+WHERE length(orderid) = 6
+and orderid<> 'Order ID'
+;
+
+
+---which product brought in the most revenue in jan and how much revenue did it bring
+SELECT Product, sum(price * Quantity) as Revenue
+FROM  JanSales
+WHERE length(orderid) = 6
+and orderid<> 'Order ID'
+group by product
+ORDER BY Revenue ASC LIMIT 1
+;
+
