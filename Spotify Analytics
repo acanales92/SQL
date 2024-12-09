@@ -33,5 +33,5 @@ limit 10
 ---whicj track last the longest
 select duration_ms, track_name, artist_name
 from Spotifydata
-ORDER BY track_name desc
+ORDER BY duration_ms desc
 ;
