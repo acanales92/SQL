@@ -1,0 +1,100 @@
+---USING A MUSIC DATABASE ANALYZE THE FOLLOWING QUESTIONS: 
+
+--1. Show Customers (their full names, customer ID, and country) who are not in the US. (Hint: != or <> can be used to say "is not equal to").
+SELECT CustomerId, FirstName, Country
+FROM customers
+WHERE Country <> 'US' and Country <>'USA'
+;
+
+--2.Show only the Customers from Brazil.
+SELECT CustomerId, FirstName, Country
+FROM customers
+WHERE Country = 'Brazil'
+;
+
+--3. Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.
+SELECT customers.FirstName, customers.LastName, 
+invoices.InvoiceId, invoices.BillingCountry, invoices.InvoiceDate
+FROM invoices
+LEFT JOIN customers
+ON invoices.CustomerId = customers.CustomerId
+WHERE  Country = 'Brazil'
+;
+
+--4. Show the Employees who are Sales Agents.
+SELECT FirstName, LastName, Title  
+FROM employees
+WHERE Title = 'Sales Support Agent'
+;
+
+--5. Find a unique/distinct list of billing countries from the Invoice table.
+Select distinct BillingCountry
+FROM invoices;
+
+--6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+SELECT employees.FirstName, employees.LastName,
+invoices.InvoiceId
+FROM employees
+INNER JOIN customers on customers.SupportRepId = employees.EmployeeId
+INNER JOIN invoices on invoices.CustomerId = customers.CustomerId;
+
+--7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT employees.FirstName, employees.LastName,
+customers.FirstName, customers.LastName, customers.Country,
+invoices.Total
+FROM employees
+JOIN customers on customers.SupportRepId = employees.EmployeeId
+JOIN invoices on invoices.CustomerId = customers.CustomerId;
+
+--8.How many Invoices were there in 2009?
+SELECT count(*)
+FROM invoices
+where InvoiceDate >= '2009-01-01' AND InvoiceDate <= '2009-12-31'
+;
+
+--9. What are the total sales for 2009?
+SELECT sum(Total)
+FROM invoices
+where InvoiceDate >= '2009-01-01' AND InvoiceDate <= '2009-12-31'
+;
+
+--10. Write a query that includes the purchased track name with each invoice line ID.
+SELECT tracks.Name, invoice_items.InvoiceLineId
+FROM tracks
+JOIN invoice_items ON tracks.TrackId = invoice_items.InvoiceLineid; 
+
+--11. Write a query that includes the purchased track name AND artist name with each invoice line ID.
+SELECT tracks.Name, artists.Name,
+invoice_items.InvoiceLineId
+FROM invoice_items
+left join tracks ON invoice_items.TrackId = tracks.TrackID
+inner join albums on albums.AlbumId = tracks.AlbumId
+left join artists on artists.ArtistId = albums.ArtistId;
+
+--12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT tracks.Name as 'Track Name', albums.Title AS 'Album Title', media_types.name AS 'Media Type', genres.Name AS 'Genre'
+FROM tracks
+INNER JOIn albums on tracks.AlbumId = albums.AlbumId
+join media_types on media_types.MediaTypeId = tracks.MediaTypeId 
+join genres on genres.GenreId = tracks.GenreId;
+
+--13.Show the total sales made by each sales agent.
+select employees.FirstName, employees.LastName,
+sum(invoices.Total) AS 'Total Sales'
+from employees
+join customers ON customers.SupportRepId = employees.EmployeeId 
+join invoices ON invoices.CustomerId = customers.CustomerId
+WHERE  employees.Title = 'Sales Support Agent'
+Group BY employees.FirstName
+;
+
+--14. Which sales agent made the most dollars in sales in 2009?
+select employees.FirstName, employees.LastName,
+sum(invoices.Total) AS 'Total Sales'
+from employees
+join customers ON customers.SupportRepId = employees.EmployeeId 
+join invoices ON invoices.CustomerId = customers.CustomerId
+WHERE  employees.Title = 'Sales Support Agent' AND invoices.InvoiceDate like '2009%'
+Group BY employees.FirstName
+Order by 'Total Sales' Limit 1
+;
